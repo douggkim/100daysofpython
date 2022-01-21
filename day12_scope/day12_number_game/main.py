@@ -20,8 +20,9 @@ def number_game():
 
   print("I'm thinking of a number between 1 and 100")
   random_num=random.randint(1,101)
+  difficulty=input("Choose a difficulty. Type 'easy' or 'hard' : ").lower()
 
-  if input("Choose a difficulty. Type 'easy' or 'hard' : ").lower()=='easy':
+  if difficulty=='easy':
     print(f"You have {EASY_ATTEMPT} attempts remaining to guess the number.")
 
     while EASY_ATTEMPT>0:
@@ -38,15 +39,16 @@ def number_game():
         if input("Do you want to play again?").lower()=='y':
           number_game()
 
-  elif input("Choose a difficulty. Type 'easy' or 'hard' : ").lower()=='hard':
+  elif difficulty=='hard':
     print(f"You have {HARD_ATTEMPT} attempts remaining to guess the number.")
 
     while HARD_ATTEMPT>0:
       print(f"You have {HARD_ATTEMPT} attempts left.")
-      if random_num > int(input("Make a guess : ")):
+      guess=int(input("Make a guess : "))
+      if random_num > guess:
         print("Too low.")
         HARD_ATTEMPT-=1
-      elif random_num < int(input("Make a guess : ")):
+      elif random_num < guess:
         print("Too high.")
         HARD_ATTEMPT-=1
       else: 
@@ -59,6 +61,8 @@ def number_game():
     number_game()
   if input("Do you want to play again?").lower()=='y':
     number_game()
+  else:
+    return
 
 number_game()
 
