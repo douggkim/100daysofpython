@@ -1,4 +1,5 @@
 from turtle import Turtle
+import time
 
 FONT = ("Courier", 24, "normal")
 
@@ -16,6 +17,8 @@ class Scoreboard(Turtle):
         self.level = 0
         self.setpos(0, 0)
         self.write("GAME OVER", align="center", font=("Verdana", 20, "normal"))
+        time.sleep(3)
+        self.clear()
 
     def success(self):
         self.clear()

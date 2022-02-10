@@ -21,3 +21,6 @@ class Player(Turtle):
         if self.ycor() >= 280:
             self.setpos(STARTING_POSITION[0], STARTING_POSITION[1])
             return True
+
+    def game_over(self):
+        self.setpos(STARTING_POSITION[0], STARTING_POSITION[1])
