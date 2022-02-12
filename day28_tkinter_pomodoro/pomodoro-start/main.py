@@ -63,6 +63,7 @@ def count_down(count):
         count_sec = f"0{count_sec}"
     # canvas 안의 요소는 canvas.itemconfig()로 접근해야 함
     canvas.itemconfig(timer_text, text=f"{count_min}:{count_sec}")
+    # after : 일정시간이 지난 후 함수를 실행시키는 함수
     if count > 0:
         timer = window.after(1000, count_down, count - 1)
     else:
