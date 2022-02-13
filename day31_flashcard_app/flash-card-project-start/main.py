@@ -6,20 +6,44 @@ import random
 BACKGROUND_COLOR = "#B1DDC6"
 
 # process dict data
-vocab_raw = pd.read_csv("./data/french_words.csv")
-vocab_dict = vocab_raw.to_dict(orient="records")
+try:
+    vocab_raw = pd.read_csv("./data/words_to_learn.csv")
+except FileNotFoundError:
+    vocab_raw = pd.read_csv("./data/french_words.csv")
+finally:
+    vocab_dict = vocab_raw.to_dict(orient="records")
+    print(type(vocab_dict))
 
 
 def reset_vocab():
     global flip_timer
     window.after_cancel(flip_timer)
     random_word = random.choice(vocab_dict)
-    random_word_en = random_word["English"]
     random_word_fr = random_word["French"]
     canvas.itemconfig(card_img, image=front_img)
     canvas.itemconfig(word_text, fill="black", text=random_word_fr)
     canvas.itemconfig(lang_text, fill="black", text="French")
     flip_timer = window.after(3000, turn_card)
+
+
+def reset_vocab_success():
+    global flip_timer
+    window.after_cancel(flip_timer)
+    known_word = canvas.itemcget(word_text, "text")
+    for word in vocab_dict:
+        if word["English"] == known_word or word["French"] == known_word:
+            print(word)
+            vocab_dict.remove(word)
+            break
+    temp_data = pd.DataFrame(vocab_dict)
+    temp_data.to_csv("./data/words_to_learn.csv", index=False)
+    random_word = random.choice(vocab_dict)
+    random_word_fr = random_word["French"]
+    canvas.itemconfig(card_img, image=front_img)
+    canvas.itemconfig(word_text, fill="black", text=random_word_fr)
+    canvas.itemconfig(lang_text, fill="black", text="French")
+    flip_timer = window.after(3000, turn_card)
+
 
 def turn_card():
     french_word = canvas.itemcget(word_text, "text")
@@ -56,7 +80,7 @@ back_img = PhotoImage(file="./images/card_back.png")
 
 # import & create buttons
 right_img = PhotoImage(file="./images/right.png")
-right_button = Button(image=right_img, highlightthickness=0, command=reset_vocab)
+right_button = Button(image=right_img, highlightthickness=0, command=reset_vocab_success)
 right_button.grid(row=1, column=1)
 
 wrong_img = PhotoImage(file="./images/wrong.png")
