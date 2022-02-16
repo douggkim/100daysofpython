@@ -1,5 +1,7 @@
 import requests
 import datetime
+from twilio.rest import Client
+import math
 
 STOCK = "GOOGL"
 COMPANY_NAME = "google"
@@ -8,6 +10,8 @@ NEWS_URL = "https://newsapi.org/v2/everything"
 with open("CONFIG.txt") as file:
     ALPHA_API_KEY = file.readline().strip()
     NEWS_API_KEY = file.readline().strip()
+    TWILIO_ACCOUNT_SID = file.readline().strip()
+    TWILIO_AUTH_TOKEN = file.readline().strip()
 
 # date before yesterday
 
@@ -40,32 +44,46 @@ news_parameters = {
 
 ## STEP 1: Use https://www.alphavantage.co
 # When STOCK price increase/decreases by 5% between yesterday and the day before yesterday then print("Get News").
+#  You could convert the response to a list instead of manipulating the date
 alpha_response = requests.get(url=ALPHA_URL, params=alpha_parameters)
 yesterday_price = float(alpha_response.json()["Time Series (Daily)"][day_before_target_date]["4. close"])
 today_price = float(alpha_response.json()["Time Series (Daily)"][target_date]["4. close"])
 price_diff = yesterday_price - today_price
-change_percentage = abs(price_diff / yesterday_price) * 100
+change_percentage = round(abs(price_diff / yesterday_price) * 100, 3) 
+if price_diff < 0:
+    price_symbol = "🔺"
+elif price_diff > 0: 
+    price_symbol = "🔻"
+else:
+    price_symbol = ""
 print(f"Yesterday's Closing Price of {STOCK}: {yesterday_price}\nToday's closing price of {STOCK}: {today_price}")
-
-print(yesterday_price)
-print(abs(price_diff))
-print(change_percentage)
 
 ## STEP 2: Use https://newsapi.org
 # Instead of printing ("Get News"), actually get the first 3 news pieces for the COMPANY_NAME. 
+news_to_send  = []
 if abs(price_diff) >= yesterday_price * 0.0000001:
     news_response = requests.get(url=NEWS_URL, params=news_parameters).json()
     articles = news_response["articles"]
+    for article in articles:
+        each_news = {}
+        each_news["price"] = STOCK +": "+price_symbol + str(change_percentage) +"%"
+        each_news["title"] = "Headline: "+ article["title"]
+        each_news["description"] = "Brief: "+article["description"]
+        each_news["url"] = "Link: " + article["url"]
+        print(each_news)
+        news_to_send.append(each_news)
+        print(news_to_send)
 
-
-    for article in news_response.json()["articles"]:
-        print(article["title"])
-        print(article["description"])
-        print(article["url"])
+print(news_to_send)
 
 ## STEP 3: Use https://www.twilio.com
 # Send a seperate message with the percentage change and each article's title and description to your phone number. 
-
+for news in news_to_send:
+    message_to_send = "\n".join(news.values())
+    client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+    message = client.messages.create(body=message_to_send, to="+821071294021",
+                                     from_="+18608916564")
+    print(message.status)
 
 # Optional: Format the SMS message like this:
 """
