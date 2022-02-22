@@ -1,0 +1,19 @@
+body{
+  background-color: #EAF6F6;
+  width: 30%;
+}
+hr{
+  border-style: none;
+  border-top-style: dotted;
+  border-color: grey;
+  border-width: 5px;
+  width: 10%;
+}
+h1{
+  color: #66BFBF;
+  font-family: "Times New Roman";
+}
+h2{
+  color: #66BFBF;
+  font-family: "Times New Roman";
+}
