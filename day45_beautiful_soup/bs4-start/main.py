@@ -35,6 +35,15 @@ print(all_anchor_tags_url)
 heading = soup.find(name="h1", id="name")
 print(heading)
 print(heading.get("id"))
-# use class_ instead of class.
+# use class_ instead of class. (class is a reserved keyword)
 section_heading = soup.find(name="h3", class_="heading")
 print(section_heading.get("class"))
+# select one element among many -> a tag inside p tag
+company_url = soup.select_one(selector="p a")
+print(company_url)
+# can select ids
+name = soup.select_one(selector="#name")
+print(name)
+# select class
+headings = soup.select(".heading")
+print(headings)
