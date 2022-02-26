@@ -1,0 +1,6 @@
+2022-02-26  Current Price: $219.02022-02-26  Current Price: $219.02022-02-26  Current Price: $219.0 
+2022-02-26  Current Price: $219.0 
+2022-02-26Price alert triggered. However there was an error sending the email to slakingex@yahoo.com
+2022-02-26Price alert triggered. Mail sent to slakingex@yahoo.com!
+2022-02-26 No alert triggered. Current Price: $219.0
+2022-02-26Price alert triggered. Mail sent to slakingex@yahoo.com!
