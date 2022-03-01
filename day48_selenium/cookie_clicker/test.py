@@ -21,8 +21,7 @@ time.sleep(5)
 
 # //*[@id="productPrice0"]
 # //*[@id="productPrice3"]
-# price_element_list = driver.find_elements_by_css_selector(".product.unlocked.enabled.content.price")
-price_element_list = driver.find_elements_by_css_selector(".product.locked.disabled .content .price")
+price_element_list = driver.find_elements_by_css_selector(".product.unlocked.enabled .content .price")
 print(price_element_list)
 price_list = [price_element.text for price_element in price_element_list]
 price_list = [int(price) for price in price_list if price!=""]
