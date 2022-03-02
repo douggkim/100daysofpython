@@ -15,11 +15,6 @@ driver.get(target_url)
 time.sleep(8)
 cookie = driver.find_element_by_xpath("//*[@id='bigCookie']")
 
-
-# //*[@id="product1"]/div[3]
-# //*[@id="product0"]/div[3]
-# //*[@id="product2"]/div[3] .product unlocked enabled content
-
 # TODO 2 : Schedule a purchaser
 def purchase_items():
     # Purchase the most expensive item every 5 seconds
