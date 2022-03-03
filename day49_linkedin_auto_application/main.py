@@ -1,7 +1,10 @@
 from selenium import webdriver
-from infinite_scroll import Infinite_Scroll
+import datetime
 import pyautogui
+import pprint
 import time
+import pandas as pd
+import os
 
 # TODO 0 : load the confidentials
 with open("CONFIG.txt") as file:
@@ -32,81 +35,68 @@ login_confirm_button = driver.find_element_by_xpath("//*[@id='organic-div']/form
 login_confirm_button.click()
 
 
-# TODO 3 : enter the job search page
+# TODO 3 : A Function to Collect info from each page
 def collect_info_each_page():
+    # get the job titles
     job_titles = driver.find_elements_by_css_selector(
         ".disabled.ember-view.job-card-container__link.job-card-list__title")
-    for index in range(len(job_titles)):
-        job_titles[index] = job_titles[index].text
-        print(job_titles[index])
+    # for index in range(len(job_titles)):
+    #     job_titles[index] = job_titles[index].text
+    job_titles = [title.text for title in job_titles]
+    # get the company names
     company_names = driver.find_elements_by_css_selector(
         ".job-card-container__link.job-card-container__company-name.ember-view")
-    for index in range(len(company_names)):
-        company_names[index] = company_names[index].text
-        print(company_names[index])
+    # for index in range(len(company_names)):
+    #     company_names[index] = company_names[index].text
+    company_names = [name.text for name in company_names]
+
+    # get the location
     location_list = driver.find_elements_by_css_selector(".job-card-container__metadata-item")
     location_list = [location.text for location in location_list]
+
+    # process exceptional cases (on-site, remote, hybrid jobs)
     new_location_list = [None] * len(location_list)
     for index in range(len(location_list)):
-        if location_list[index] == "On-site" or location_list[index] == "Remote":
+        if location_list[index] == "On-site" or location_list[index] == "Remote" or location_list[index] == "Hybrid":
             location = f"{location_list[index - 1]} ({location_list[index]})"
-            print(location)
             new_location_list[index - 1] = location
+        elif "benefit" in location_list[index]:
+            pass
         else:
             new_location_list[index] = location_list[index]
     new_location_list = [location for location in new_location_list if location is not None]
-    print(new_location_list)
+
+    # combine the scraped data into a pandas DF
     job_dict = {}
-    for index in range(len(company_names)):
+    for index in range(len(new_location_list)):
         job_dict[index] = {
             "Company": company_names[index],
             "Position": job_titles[index],
             "Location": new_location_list[index],
         }
-    print(job_dict)
+    pprint.pprint(job_dict)
+    job_df = pd.DataFrame(job_dict).T
 
+    file_name = datetime.datetime.now().strftime("%y%m%d")+"_job_listing.csv"
+    job_df.to_csv(file_name, mode='a', header= not os.path.exists(file_name))
 
-
+# TODO 4 : Scrape from each page
+# move the mouse to the job listing part of the page
 pyautogui.moveTo(500, 540)
-print
-while not driver.find_elements_by_css_selector(".artdeco-pagination__indicator.artdeco-pagination__indicator--number.ember-view button"):
+
+# get the list of pagination buttons
+button_list = driver.find_elements_by_css_selector(
+    ".artdeco-pagination__indicator.artdeco-pagination__indicator--number.ember-view button")
+
+# iterate and scrape each page
+for num in range(len(button_list)):
+    # have to scroll to the end of the page because the page is loaded as it scrolls to the bottom
+    pyautogui.scroll(-4000)
+    # wait until all the elements are loaded
+    time.sleep(3)
     collect_info_each_page()
-    pyautogui.scroll(-1500)
-    print(driver.find_elements_by_css_selector(".artdeco-pagination__indicator.artdeco-pagination__indicator--number.ember-view"))
-
-driver.find_elements_by_css_selector(".artdeco-pagination__indicator.artdeco-pagination__indicator--number.ember-view")[0].click()
-
-# infinite_scroll = Infinite_Scroll(driver=driver)
-
-SCROLL_PAUSE_TIME = 0.5
-
-# Get scroll height
-last_height = driver.execute_script("return document.body.scrollHeight")
-
-# while True:
-#     # Scroll down to bottom
-#     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-#
-#     # Wait to load page
-#     collect_info_each_page()
-#     time.sleep(SCROLL_PAUSE_TIME)
-#
-#     # Calculate new scroll height and compare with last scroll height
-#     new_height = driver.execute_script("return document.body.scrollHeight")
-#     if new_height == last_height:
-#         break
-#     last_height = new_height
-#     # infinite_scroll.exec()
-
-# while driver.find_element_by_css_selector('.jobs-search__left-rail'):
-#     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-#     collect_info_each_page()
-#     Divs = driver.find_element_by_css_selector('.jobs-search__left-rail').text
-#     if 'End of Results' in Divs:
-#         print('end')
-#         break
-#     else:
-#         continue
-
-
-
+    # each element has different class names for each page, so the paginatino buttons should be newly loaded
+    button_list = driver.find_elements_by_css_selector(
+        ".artdeco-pagination__indicator.artdeco-pagination__indicator--number.ember-view button")
+    if num != len(button_list) - 1:
+        button_list[num + 1].click()
