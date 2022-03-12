@@ -1,0 +1,13 @@
+/***select by class ***/
+h1{
+  font-family: "Montserrat";
+  font-weight: 900;
+  font-size: 3rem;
+  line-height: 1.5;
+}
+
+
+/*** select  by id ***/
+#title{
+  background-color: #ff4c68;
+}
