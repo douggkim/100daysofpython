@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Rating</title>
+</head>
+<body>
+    <form action="{{url_for('home')}}" method="POST">
+        <p>Book Name</p>
+        <p>{{book.title}}</p>
+        <p>Author</p>
+        <p>{{book.author}}</p>
+        <label>Rating</label>
+        <input name="id" hidden="hidden" value="{{book.id}}">
+        <input type="text" name="rating">
+        <button type="submit">Edit Rating</button>
+    </form>
+</body>
+</html>
